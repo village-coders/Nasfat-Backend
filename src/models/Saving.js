@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
-const contributionSchema = new mongoose.Schema({
-  user: {
+const savingSchema = new mongoose.Schema({
+  userId: {
     type: mongoose.Schema.ObjectId,
     ref: 'User',
     required: true
@@ -11,18 +11,21 @@ const contributionSchema = new mongoose.Schema({
     required: [true, 'Please add an amount']
   },
   receiptUrl: {
-    type: String,
-    required: [true, 'Please upload a receipt']
+    type: String
   },
-  status: {
+  type: {
     type: String,
-    enum: ['pending', 'verified', 'paid'],
-    default: 'pending'
+    default: 'Monthly Deposit'
   },
   date: {
     type: Date,
     default: Date.now
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'verified', 'rejected'],
+    default: 'pending'
   }
 });
 
-module.exports = mongoose.model('Contribution', contributionSchema);
+module.exports = mongoose.model('Saving', savingSchema);

@@ -1,10 +1,10 @@
-const mongoose = require('bcryptjs');
-const mongooseClient = require('mongoose');
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
-const userSchema = new mongooseClient.Schema({
-  name: {
+const userSchema = new mongoose.Schema({
+  fullName: {
     type: String,
-    required: [true, 'Please add a name']
+    required: [true, 'Please add a full name']
   },
   email: {
     type: String,
@@ -15,27 +15,39 @@ const userSchema = new mongooseClient.Schema({
       'Please add a valid email'
     ]
   },
-  role: {
-    type: String,
-    enum: ['user', 'admin'],
-    default: 'user'
-  },
-  isEmailVerified: {
-    type: Boolean,
-    default: false
-  },
-  emailVerificationToken: String,
   password: {
     type: String,
     required: [true, 'Please add a password'],
     minlength: 6,
     select: false
   },
-  resetPasswordToken: String,
-  resetPasswordExpire: Date,
-  createdAt: {
+  role: {
+    type: String,
+    enum: ['client', 'admin'],
+    default: 'client'
+  },
+  profileImage: {
+    type: String,
+    default: 'https://res.cloudinary.com/demo/image/upload/v1611252131/sample.jpg'
+  },
+  paymentFrequency: {
+    type: String,
+    enum: ['weekly', 'monthly'],
+    default: 'monthly'
+  },
+  status: {
+    type: String,
+    enum: ['active', 'inactive'],
+    default: 'active'
+  },
+  joinedDate: {
     type: Date,
     default: Date.now
+  },
+  paymentStatus: {
+    type: String,
+    enum: ['paid', 'unpaid'],
+    default: 'unpaid'
   }
 });
 
@@ -44,10 +56,8 @@ userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     next();
   }
-
-  const bcrypt = require('bcryptjs');
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-module.exports = mongooseClient.model('User', userSchema);
+module.exports = mongoose.model('User', userSchema);
