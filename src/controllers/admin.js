@@ -56,11 +56,13 @@ exports.verifySaving = async (req, res) => {
   }
 };
 
-// @desc    Deactivate client (Legacy support, optional)
+// @desc    Deactivate client
+// @route   PUT /api/admin/deactivate-client/:id
+// @access  Private (Admin)
 exports.deactivateClient = async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(
-      req.params.clientId,
+      req.params.id,
       { status: 'inactive' },
       { new: true }
     );
@@ -69,7 +71,11 @@ exports.deactivateClient = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    res.status(200).json({ success: true, data: user });
+    res.status(200).json({
+      success: true,
+      message: 'Client deactivated successfully',
+      data: user
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

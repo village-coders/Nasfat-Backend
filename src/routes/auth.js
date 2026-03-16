@@ -1,5 +1,5 @@
 const express = require('express');
-const { register, login, adminLogin, verifyOTP, resendOTP } = require('../controllers/auth');
+const { register, login, adminLogin, verifyOTP, resendOTP, forgotPassword, resetPassword } = require('../controllers/auth');
 const upload = require('../middleware/upload');
 
 const router = express.Router();
@@ -9,5 +9,7 @@ router.post('/login', login);
 router.post('/admin-login', adminLogin);
 router.post('/verify-otp', verifyOTP);
 router.post('/resend-otp', resendOTP);
+router.post('/forgotpassword', forgotPassword);
+router.put('/resetpassword/:resettoken', resetPassword);
 
 module.exports = router;
