@@ -21,7 +21,7 @@ const savingSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'verified', 'rejected'],
+    enum: ['pending', 'paid', 'rejected'],
     default: 'pending'
   }
 }, {

@@ -6,7 +6,7 @@ const Saving = require('../models/Saving');
 // @access  Private (Admin)
 exports.getDashboard = async (req, res) => {
   try {
-    const clients = await User.find({ role: 'client' });
+    const clients = await User.find({ role: 'client' }).sort({ createdAt: -1 });
 
     res.status(200).json({
       clients,
@@ -27,6 +27,30 @@ exports.getClientSavings = async (req, res) => {
     res.status(200).json({
       savings
     });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// @desc    Verify saving (mark as paid)
+// @route   PUT /api/admin/verify-saving/:id
+// @access  Private (Admin)
+exports.verifySaving = async (req, res) => {
+  try {
+    const saving = await Saving.findByIdAndUpdate(
+      req.params.id,
+      { status: 'paid' },
+      { new: true }
+    );
+
+    if (!saving) {
+      return res.status(404).json({ message: 'Saving not found' });
+    }
+
+    // Update user status as well
+    await User.findByIdAndUpdate(saving.userId, { status: 'paid' });
+
+    res.status(200).json(saving);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

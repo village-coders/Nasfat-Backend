@@ -98,6 +98,10 @@ exports.adminLogin = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
+    if (admin.role !== 'admin') {
+      return res.status(403).json({ message: 'Access denied. Not an admin.' });
+    }
+
     const token = generateToken(admin._id);
 
     res.status(200).json({
