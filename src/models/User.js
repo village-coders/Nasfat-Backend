@@ -37,6 +37,18 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ["paid", "unpaid", "pending"],
     default: "unpaid"
+  },
+  isVerified: {
+    type: Boolean,
+    default: false
+  },
+  otp: {
+    type: String,
+    select: false
+  },
+  otpExpires: {
+    type: Date,
+    select: false
   }
 }, {
   timestamps: true
