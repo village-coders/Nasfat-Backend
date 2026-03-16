@@ -10,22 +10,22 @@ const savingSchema = new mongoose.Schema({
     type: Number,
     required: [true, 'Please add an amount']
   },
-  receiptUrl: {
-    type: String
-  },
   type: {
     type: String,
-    default: 'Monthly Deposit'
+    enum: ["weekly", "monthly"],
+    required: true
   },
-  date: {
-    type: Date,
-    default: Date.now
+  receiptUrl: {
+    type: String,
+    required: [true, 'Please add a receipt URL']
   },
   status: {
     type: String,
     enum: ['pending', 'verified', 'rejected'],
     default: 'pending'
   }
+}, {
+  timestamps: true
 });
 
 module.exports = mongoose.model('Saving', savingSchema);

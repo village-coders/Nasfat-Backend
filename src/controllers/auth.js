@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Admin = require('../models/Admin');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
@@ -15,17 +16,20 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    const profileImage = req.file ? req.file.path : undefined;
+    const profileImage = req.file ? req.file.path : "";
 
     user = await User.create({
       fullName,
       email,
       password,
-      paymentFrequency: paymentFrequency || 'monthly',
+      paymentFrequency,
       profileImage
     });
 
-    sendTokenResponse(user, 201, res);
+    res.status(201).json({
+      success: true,
+      message: "User registered successfully"
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -48,39 +52,68 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    if (user.status === 'inactive') {
-      return res.status(403).json({ message: 'Your account is inactive. Please contact admin.' });
-    }
-
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    sendTokenResponse(user, 200, res);
+    const token = generateToken(user._id);
+
+    res.status(200).json({
+      token,
+      user: {
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        profileImage: user.profileImage,
+        role: user.role
+      }
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// Get token from model, create cookie and send response
-const sendTokenResponse = (user, statusCode, res) => {
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: '30d'
-  });
+// @desc    Admin login
+// @route   POST /api/auth/admin-login
+// @access  Public
+exports.adminLogin = async (req, res) => {
+  const { email, password } = req.body;
 
-  res.status(statusCode).json({
-    success: true,
-    token,
-    user: {
-      id: user._id,
-      fullName: user.fullName,
-      email: user.email,
-      role: user.role,
-      profileImage: user.profileImage,
-      paymentFrequency: user.paymentFrequency,
-      status: user.status
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Please provide email and password' });
+  }
+
+  try {
+    const admin = await Admin.findOne({ email }).select('+password');
+
+    if (!admin) {
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
+
+    const isMatch = await bcrypt.compare(password, admin.password);
+
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    const token = generateToken(admin._id);
+
+    res.status(200).json({
+      token,
+      admin: {
+        email: admin.email,
+        role: admin.role
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: '30d'
   });
 };

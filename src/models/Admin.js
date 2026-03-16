@@ -1,11 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-const userSchema = new mongoose.Schema({
-  fullName: {
-    type: String,
-    required: [true, 'Please add a full name']
-  },
+const adminSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, 'Please add an email'],
@@ -21,29 +17,16 @@ const userSchema = new mongoose.Schema({
     minlength: 6,
     select: false
   },
-  paymentFrequency: {
-    type: String,
-    enum: ["weekly", "monthly"]
-  },
-  profileImage: {
-    type: String,
-    default: ""
-  },
   role: {
     type: String,
-    default: "client"
-  },
-  status: {
-    type: String,
-    enum: ["paid", "unpaid", "pending"],
-    default: "unpaid"
+    default: "admin"
   }
 }, {
   timestamps: true
 });
 
 // Encrypt password using bcrypt
-userSchema.pre('save', async function (next) {
+adminSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     next();
   }
@@ -51,4 +34,4 @@ userSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('Admin', adminSchema);

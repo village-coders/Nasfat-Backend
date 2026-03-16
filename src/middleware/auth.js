@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Admin = require('../models/Admin');
 
 const protect = async (req, res, next) => {
   let token;
@@ -11,12 +12,20 @@ const protect = async (req, res, next) => {
     try {
       token = req.headers.authorization.split(' ')[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = await User.findById(decoded.id);
-
-      if (!req.user) {
-        return res.status(401).json({ message: 'User not found' });
+      
+      // Try to find in User collection
+      let identity = await User.findById(decoded.id);
+      
+      // If not in User, try Admin collection
+      if (!identity) {
+        identity = await Admin.findById(decoded.id);
       }
 
+      if (!identity) {
+        return res.status(401).json({ message: 'User or Admin not found' });
+      }
+
+      req.user = identity; // Common key for simplicity
       next();
     } catch (error) {
       return res.status(401).json({ message: 'Not authorized' });

@@ -1,15 +1,11 @@
 const express = require('express');
-const { getDashboard, submitSavings, updateSavingsMode } = require('../controllers/client');
-const { protect, authorize } = require('../middleware/auth');
+const { getDashboard, submitSavings } = require('../controllers/client');
+const { protect } = require('../middleware/auth');
 const upload = require('../middleware/upload');
 
 const router = express.Router();
 
-router.use(protect);
-router.use(authorize('client'));
-
-router.get('/dashboard', getDashboard);
-router.post('/savings', upload.single('receipt'), submitSavings);
-router.put('/savings-mode', updateSavingsMode);
+router.get('/dashboard', protect, getDashboard);
+router.post('/savings', protect, upload.single('receipt'), submitSavings);
 
 module.exports = router;
