@@ -5,7 +5,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const sendEmail = async (options) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: `${process.env.FROM_NAME || 'Nasfat Contribution'} <${process.env.FROM_EMAIL || 'onboarding@resend.dev'}>`,
+      from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
       to: options.email,
       subject: options.subject,
       text: options.message,
