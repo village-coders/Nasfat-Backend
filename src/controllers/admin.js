@@ -48,7 +48,7 @@ exports.verifySaving = async (req, res) => {
     }
 
     // Update user status as well
-    await User.findByIdAndUpdate(saving.userId, { status: 'paid' });
+    await User.findByIdAndUpdate(saving.userId, { status: 'active' });
 
     res.status(200).json(saving);
   } catch (err) {
@@ -80,3 +80,25 @@ exports.deactivateClient = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+exports.activateClient = async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { status: 'active' },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Client activated successfully',
+      data: user
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}

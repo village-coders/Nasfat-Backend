@@ -1,5 +1,5 @@
 const express = require('express');
-const { getDashboard, getClientSavings, verifySaving, deactivateClient } = require('../controllers/admin');
+const { getDashboard, getClientSavings, verifySaving, deactivateClient, activateClient } = require('../controllers/admin');
 const { protect, authorize } = require('../middleware/auth');
 
 const router = express.Router();
@@ -11,5 +11,6 @@ router.get('/dashboard', getDashboard);
 router.get('/client/:id/savings', getClientSavings);
 router.put('/verify-saving/:id', verifySaving);
 router.put('/deactivate-client/:id', deactivateClient);
+router.put('/activate-client/:id', activateClient);
 
 module.exports = router;
